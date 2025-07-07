@@ -154,7 +154,7 @@
   <p:variable name="content-type" select="p:document-property(/, 'Q{}' || 'content-type')" />
   <p:variable name="prefix" select="if(exists($step)) then format-integer($step, '0000') || '-' else ''" />
   <p:variable name="output-directory-uri" select="p:urify($output-directory, $base-uri)" />
-  <p:variable name="delimiter-uri" select="if(ends-with($output-directory-uri, '/') then '' else '/')" />
+  <p:variable name="delimiter-uri" select="if(ends-with($output-directory-uri, '/')) then '' else '/'" />
   <p:variable name="full-path-uri" select="concat($output-directory-uri, $delimiter-uri, $prefix, $file-name)" />
   
   
