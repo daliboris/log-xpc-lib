@@ -71,7 +71,35 @@
   <p:input  port="source" primary="true"/>
   <p:output port="result" primary="true" pipe="source@logging-message" />
   
-  <p:if test="$debug">
+  <p:choose message="choose {$debug}" use-when="true()">
+   <p:when test="$debug">
+    <p:choose>
+     <p:when test="$format = 'xml'">
+      <p:identity>
+       <p:with-input port="source">
+        <xlog:log time="{current-dateTime()}" level="{$level}">{$message}</xlog:log>
+       </p:with-input>
+      </p:identity>
+     </p:when>
+     <p:when test="$format = 'text'">
+      <p:identity>
+       <p:with-input port="source">
+        <p:inline content-type="text/plain">[{current-dateTime()}] {$level}: {$message}</p:inline>
+       </p:with-input>
+      </p:identity>
+     </p:when>
+    </p:choose>
+    
+    <p:if test="($format = 'text')" message="if">
+     <p:identity message="from if: {/}" />
+    </p:if>    
+   </p:when>
+   <p:otherwise>
+    <p:identity  message="otherwise when identity" />
+   </p:otherwise>
+  </p:choose>
+  
+  <p:if test="$debug" use-when="false()">
    <p:choose>
     <p:when test="$format = 'xml'">
      <p:identity>
@@ -90,7 +118,7 @@
    </p:choose>
    
    <p:if test="($format = 'text')">
-    <p:identity message="{/}" />
+    <p:identity message="from if: {/}" />
    </p:if>
    
   </p:if>
@@ -125,6 +153,7 @@
   <!-- VARIABLES -->
   <p:variable name="content-type" select="p:document-property(/, 'Q{}' || 'content-type')" />
   <p:variable name="prefix" select="if(exists($step)) then format-integer($step, '0000') || '-' else ''" />
+  
   <p:variable name="full-path" select="concat($output-directory, '/', $prefix, $file-name)" />
   
   <p:variable name="full-path-uri"  select="resolve-uri($full-path, $base-uri)" />
